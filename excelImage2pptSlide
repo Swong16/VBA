@@ -1,0 +1,52 @@
+'Copy images from worksheet and paste it to a powerpoint
+'30/03/2022
+
+Sub excelImage2pptSlide()
+
+  Dim myImage As Shape
+  Dim ws As Worksheet
+  Set ws = ActiveSheet
+
+  Dim ii As Integer
+  Dim numImg As Integer
+
+  Dim ppApp As PowerPoint.Application
+  Dim ppPres As PowerPoint.Presentation
+  Dim ppSlide As PowerPoint.Slide
+  Dim pptLayout As CustomLayout
+   
+  numImg = 1
+   
+  'Get opened powerpoint application
+  On Error Resume Next
+  Set ppApp = GetObject(, "PowerPoint.Application")
+  On Error GoTo 0
+     
+  'If no powerpoint open
+  If ppApp Is Nothing Then
+    MsgBox "No powerpoint open"
+    End
+  End If
+   
+   
+  'code to copy image in excel to powerpoint
+  For Each myImage In ws.Shapes
+     
+    If myImage.Type = msoPicture Then
+     
+      numImg = numImg + 1
+      ws.Shapes.Range(Array(myImage.Name)).Select
+      Selection.Copy
+       
+      Call ppApp.ActivePresentation.Slides.Add(ppApp.ActivePresentation.Slides.Count + 1, ppLayoutBlank)
+      Call ppApp.ActivePresentation.Slides(numImg).Select
+      ppApp.ActivePresentation.Slides(numImg).Shapes.PasteSpecial(DataType:=ppPasteEnhancedMetafile).Select
+
+     
+    End If
+
+  Next myImage
+
+  Call ppApp.ActivePresentation.Slides(1).Delete
+
+End Sub
